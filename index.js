@@ -25,18 +25,27 @@ function unpipe (source, dest) {
   // Destination not found
   if (idx === n) return false
 
-  // Look for the cleanup listener for the destination
-  var list = source.listeners('end')
+  // Look for the cleanup listener for the given destination
+  var sourceList = source.listeners('end')
 
-  for (var i = 0, n = list.length; i < n; i++) {
-    if ( list[i].name === 'cleanup' && --idx < 0 ) {
-      // Tidy up
-      list[i]()
-      // Remove the reference to the destination
-      pipes.splice(idx, 1)
-      if (pipes.length === 0) source._pipes = null
+  for (var i = 0, n = sourceList.length; i < n; i++) {
+    if ( sourceList[i].name === 'cleanup' && --idx < 0 ) {
+      // Check the same exists on the destination
+      var destList = dest.listeners('end')
 
-      return true
+      for (var j = 0, m = destList.length; j < m; j++) {
+        if ( destList[j] === sourceList[i] ) {
+          // Tidy up
+          sourceList[i]()
+          // Remove the reference to the destination
+          pipes.splice(idx, 1)
+          if (pipes.length === 0) source._pipes = null
+
+          return true
+        }
+      }
+
+      return false
     }
   }
   // This should not happen
