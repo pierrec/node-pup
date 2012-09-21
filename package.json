@@ -1,0 +1,23 @@
+{
+  "name": "pup",
+  "version": "0.0.1",
+  "description": "Pipe and Unpipe Streams",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pierrec/node-pup.git"
+  },
+  "keywords": [
+    "stream", "pipe", "unpipe"
+  ],
+  "engines": {
+    "node": "0.8.x"
+  },
+  "dependencies": {
+  },
+  "author": "Pierre Curto",
+  "license": "MIT"
+}
