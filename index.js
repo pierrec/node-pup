@@ -7,13 +7,13 @@ exports.pipe = pipe
 exports.unpipe = unpipe
 
 // source | dest
-function pipe (source, dest) {
+function pipe (source, dest, options) {
   // Keep track of the pipes
   source._pipes = source._pipes || []
   source._pipes.push(dest)
 
   // Standard Stream#pipe
-  source.pipe(dest)
+  source.pipe(dest, options)
 }
 
 function unpipe (source, dest) {
