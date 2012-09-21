@@ -2,7 +2,7 @@
 
 ## Overview
 
-As of node 0.8.x, there is no way to unpipe streams. This module attemps to fill the gap by providing a `pipe(source, destination)` and `unpipe(source, destination)` functions working in tandem, to do piping and unpiping of streams.
+As of node 0.8.x, there is no way to unpipe streams. This module attemps to fill the gap by providing a `pipe(source, destination[, options])` and `unpipe(source, destination)` functions working in tandem, to do piping and unpiping of streams.
 This is a bit of a hack that relies on the assumption that there is a `cleanup()` listener for the `end` event on the source and destination.
 
 ## Usage
