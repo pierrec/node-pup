@@ -8,46 +8,34 @@ exports.unpipe = unpipe
 
 // source | dest
 function pipe (source, dest, options) {
-  // Keep track of the pipes
-  source._pipes = source._pipes || []
-  source._pipes.push(dest)
-
   // Standard Stream#pipe
   source.pipe(dest, options)
+
+  // Keep track of the pipes and the associated cleanup functions
+  source._pipes = source._pipes || []
+  source._pipes.push(dest, last(source), last(dest))
 }
 
 function unpipe (source, dest) {
   // Find the destination in the saved pipes
   var pipes = source._pipes || []
-  for (var idx = 0, n = pipes.length; idx < n ; idx++) {
-    if (pipes[idx] === dest) break
-  }
-  // Destination not found
-  if (idx === n) return false
+  for (var i = 0, n = pipes.length; i < n ; i += 3) {
+    if (pipes[i] === dest) {
+      // Tidy up
+      pipes[i+1]()
+      pipes[i+2]()
+      // Remove the reference to the destination
+      pipes.splice(i, 3)
+      if (pipes.length === 0) source._pipes = null
 
-  // Look for the cleanup listener for the given destination
-  var sourceList = source.listeners('end')
-
-  for (var i = 0, n = sourceList.length; i < n; i++) {
-    if ( sourceList[i].name === 'cleanup' && --idx < 0 ) {
-      // Check the same exists on the destination
-      var destList = dest.listeners('end')
-
-      for (var j = 0, m = destList.length; j < m; j++) {
-        if ( destList[j] === sourceList[i] ) {
-          // Tidy up
-          sourceList[i]()
-          // Remove the reference to the destination
-          pipes.splice(idx, 1)
-          if (pipes.length === 0) source._pipes = null
-
-          return true
-        }
-      }
-
-      return false
+      return true
     }
   }
-  // This should not happen
+  // Destination not found
   return false
+}
+
+function last (s) {
+  var arr = s.listeners('end')
+  return arr[ arr.length-1 ]
 }
